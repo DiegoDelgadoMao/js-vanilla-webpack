@@ -1,22 +1,18 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-// const CopyPlugin = require('copy-webpack-plugin');
-// const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-// const TerserPlugin = require('terser-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
 	entry: './src/index.js',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		// antes -> filename: '[name].[contenthash].js',
 		filename: '[name].js',
-		// antes -> assetModuleFilename: 'assets/images/[hash][ext][query]',
 		assetModuleFilename: 'assets/images/[name][ext][query]',
 	},
 	mode: 'development',
-	watch: true,
+	devtool: 'source-map',
 	resolve: {
 		extensions: ['.js'],
 		alias: {
@@ -52,7 +48,6 @@ module.exports = {
 				test: /\.(woff|woff2)$/,
 				type: "asset/resource",
 				generator: {
-					// antes -> filename: 'assets/fonts/[name].[contenthash][ext][query]',
 					filename: 'assets/fonts/[name][ext][query]',
 				},
 			},
@@ -65,21 +60,22 @@ module.exports = {
 			filename: './index.html',
 		}),
 		new MiniCssExtractPlugin({
-			// antes -> filename: 'assets/styles/[name].[contenthash].css'
 			filename: 'assets/styles/[name].css'
 		}),
-		// new CopyPlugin({
-		// 	patterns: [
-		// 		{
-		// 			from: path.resolve(__dirname, "src", "assets/images"),
-		// 			to: "assets/images"
-		// 		}
-		// 	]
-		// }),
 		new Dotenv(),
+		new BundleAnalyzerPlugin()
 	],
-	// optimization: {
-	// 	minimize: true,
-	// 	minimizer: [new CssMinimizerPlugin]
-	// }
+	devServer: {
+		static:
+		{
+			directory: path.join(__dirname, "dist"),
+			watch: true,
+		},
+		watchFiles: path.join(__dirname, "./**"), //observa los cambios en todos nuestros archivos y actualiza el navegador
+		compress: true,
+		historyApiFallback: true,
+		port: 3006,
+		open: false, //Hace que se abra en el navegador
+
+	},
 }
